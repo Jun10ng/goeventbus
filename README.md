@@ -17,5 +17,9 @@ a simple event bus in golang
 		}
 	}()
 	bus.Publish("topic1", 7)
+	// or use PubFunc to publish to a certain topic
+	pubFunc := bus.PubFunc("topic1")
+	pubFunc(7)
+
 ```
 For more details,see [testfile](https://github.com/Jun10ng/goeventbus/blob/master/bus_test.go)
