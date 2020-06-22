@@ -16,3 +16,9 @@ func NewNode() node {
 		rw:   sync.RWMutex{},
 	}
 }
+
+func (n *node) SubsLen() int {
+	n.rw.RLock()
+	defer n.rw.RUnlock()
+	return len(n.subs)
+}
