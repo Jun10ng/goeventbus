@@ -15,8 +15,7 @@ func (s *Sub) receive(msg interface{}) {
 	s.out <- msg
 }
 
-// Out return a msg which out from Sub.out channel
+// Out return Sub.out channel
 func (s *Sub) Out() (msg interface{}) {
-	msg = <-s.out
-	return
+	return (<-s.out)
 }
