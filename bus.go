@@ -31,6 +31,7 @@ func (b *Bus) Subscribe(topic string, sub Sub) {
 		defer b.rw.Unlock()
 		n := NewNode()
 		b.subNode[topic] = &n
+		n.subs = append(n.subs, sub)
 	}
 }
 
@@ -52,7 +53,31 @@ func (b *Bus) Publish(topic string, msg interface{}) error {
 		return nil
 	} else {
 		// topic not exist
+		defer b.rw.Unlock()
 		return errors.New("topic not exist")
 	}
 
+}
+
+// PubFunc return a function that publish msg to one topic
+func (b *Bus) PubFunc(topic string) func(msg interface{}) {
+	return func(msg interface{}) {
+		b.Publish(topic, msg)
+	}
+}
+
+// SubsLen return the length of subs contained topic node
+func (b *Bus) SubsLen(topic string) (int, error) {
+	b.rw.Lock()
+	if n, ok := b.subNode[topic]; ok {
+		// found the node
+		b.rw.Unlock()
+		n.rw.RLock()
+		defer n.rw.RUnlock()
+		return n.SubsLen(), nil
+	} else {
+		// topic not exist
+		defer b.rw.Unlock()
+		return 0, errors.New("topic not exist")
+	}
 }
