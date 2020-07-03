@@ -35,6 +35,17 @@ func (b *Bus) Subscribe(topic string, sub Sub) {
 	}
 }
 
+func (b *Bus) UnSubscribe(topic string, sub Sub) {
+	b.rw.Lock()
+	if n, ok := b.subNode[topic]; ok && (n.SubsLen() > 0) {
+		b.rw.Unlock()
+		b.subNode[topic].removeSub(sub)
+	} else {
+		b.rw.Unlock()
+		return
+	}
+}
+
 // Publish msg to all subscriber who have subscribed to the topic
 func (b *Bus) Publish(topic string, msg interface{}) error {
 	b.rw.Lock()
